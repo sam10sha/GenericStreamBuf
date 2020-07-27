@@ -28,6 +28,11 @@ int main(int argc, char** argv)
     IStream.read(Bytes, 5);
     cout << Bytes << endl;
     
+    OStream << "Hi";
+    std::memset(Bytes, 0, 0x40);
+    IStream.read(Bytes, 5);
+    cout << Bytes << endl;
+    
     
     //cout << IStream.rdbuf();
     //StreamBuf.PrintStreamBuf();

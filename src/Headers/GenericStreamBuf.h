@@ -1,8 +1,7 @@
 #ifndef GENERICSTREAMBUF_H
 #define GENERICSTREAMBUF_H
 
-#include <boost/circular_buffer.hpp>
-#include <iostream>
+#include <streambuf>
 
 namespace GenericIOStreamTest
 {
