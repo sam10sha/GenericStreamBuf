@@ -29,9 +29,12 @@ void GenericIOStreamTest::GenericIStreamBuf::RegisterOnDataRetrieveCallback(Data
 // Protected member functions
 std::basic_streambuf<char>::int_type GenericIOStreamTest::GenericIStreamBuf::underflow()
 {
+    //std::basic_streambuf<char>::char_type* PutBegin = pbase();
+    std::basic_streambuf<char>::char_type* PutEnd = epptr();
+    std::basic_streambuf<char>::char_type* PutCurrent = pptr();
     if(DataRetrieveCB)
     {
-        DataRetrieveCB->Invoke(InternalMem, MemLength);
+        DataRetrieveCB->Invoke(PutCurrent, PutEnd - PutCurrent);
     }
     return std::basic_streambuf<char>::underflow();
 }

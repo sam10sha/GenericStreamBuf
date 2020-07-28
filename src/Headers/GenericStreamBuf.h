@@ -15,6 +15,7 @@ namespace GenericIOStreamTest
     // Public member functions
     public:
         void PrintStreamBuf();
+        void PrintStatus();
         
     // Protected member functions
     protected:
@@ -26,6 +27,7 @@ namespace GenericIOStreamTest
     private:
         const size_t MemLength;
         char* InternalMem;
+        bool PCAdvance;
     };
 }
 

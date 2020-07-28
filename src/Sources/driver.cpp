@@ -18,19 +18,37 @@ int main(int argc, char** argv)
     char Bytes[0x40];
     std::memset(Bytes, 0, 0x40);
     
+    cout << "Starting 1" << endl;
     OStream << "Hello";
-    //IStream.read(Bytes, 6);
-    IStream.read(Bytes, 5);
-    cout << Bytes << endl;
-    
-    OStream << "world";
-    //IStream.read(Bytes, 6);
-    IStream.read(Bytes, 5);
-    cout << Bytes << endl;
-    
-    OStream << "Hi";
+    //OStream << "world";
+    StreamBuf.PrintStatus();
+    StreamBuf.PrintStreamBuf();
     std::memset(Bytes, 0, 0x40);
     IStream.read(Bytes, 5);
+    StreamBuf.PrintStatus();
+    cout << Bytes << endl;
+    
+    /* OStream << "world";
+    StreamBuf.PrintStreamBuf();
+    std::memset(Bytes, 0, 0x40);
+    IStream.read(Bytes, 5);
+    cout << Bytes << endl; */
+    
+    cout << "Starting 2" << endl;
+    OStream << "Hi";
+    /* OStream << "Hello";
+    OStream << "world";
+    OStream << "this";
+    OStream << "is";
+    OStream << "Saumil";
+    StreamBuf.sputc('h'); */
+    cout << "Done outputting data" << endl;
+    StreamBuf.PrintStatus();
+    StreamBuf.PrintStreamBuf();
+    std::memset(Bytes, 0, 0x40);
+    cout << Bytes << endl;
+    IStream.read(Bytes, 5);
+    StreamBuf.PrintStatus();
     cout << Bytes << endl;
     
     
