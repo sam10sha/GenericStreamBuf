@@ -8,7 +8,7 @@ GenericIOStreamTest::GenericStreamBuf::GenericStreamBuf(const size_t BufferSize)
     PCAdvance(true)
 {
     std::memset(InternalMem, 0, BufferSize);
-    setp(InternalMem, InternalMem, InternalMem + BufferSize);
+    setp(InternalMem, InternalMem + BufferSize);
     setg(InternalMem, InternalMem, InternalMem);
 }
 
@@ -42,8 +42,6 @@ void GenericIOStreamTest::GenericStreamBuf::PrintStatus()
 // Protected member functions
 std::basic_streambuf<char>::int_type GenericIOStreamTest::GenericStreamBuf::overflow(std::basic_streambuf<char>::int_type ch)
 {
-    std::cout << "GenericStreamBuf[overflow]: Overflow" << std::endl;
-    
     std::basic_streambuf<char>::int_type Result;
     
     //std::basic_streambuf<char>::char_type* PutBegin = pbase();
@@ -58,39 +56,36 @@ std::basic_streambuf<char>::int_type GenericIOStreamTest::GenericStreamBuf::over
     {
         if(PutEnd < InternalMem + MemLength)
         {
-            setp(PutEnd, PutEnd, InternalMem + MemLength);
+            setp(PutEnd, InternalMem + MemLength);
         }
-        else //if(GetCurrent != InternalMem)
+        else
         {
-            setp(InternalMem, InternalMem, GetCurrent);
+            setp(InternalMem, GetCurrent);
         }
     }
-    else if(PutEnd < GetEnd) //&& PutEnd != GetCurrent)
+    else if(PutEnd < GetEnd)
     {
-        setp(PutEnd, PutEnd, GetCurrent);
+        setp(PutEnd, GetCurrent);
     }
     else if(!PCAdvance)
     {
         if(PutEnd < InternalMem + MemLength)
         {
-            setp(PutEnd, PutEnd, InternalMem + MemLength);
+            setp(PutEnd, InternalMem + MemLength);
         }
         else
         {
-            setp(InternalMem, InternalMem, GetCurrent);
+            setp(InternalMem, GetCurrent);
         }
     }
 	
     PCAdvance = true;
-    //PrintStatus();
     if(epptr() - pptr() > 0)
     {
-        std::cout << "GenericStreamBuf[overflow]: Write space available" << std::endl;
         Result = sputc(ch);
     }
     else
     {
-        std::cout << "GenericStreamBuf[overflow]: Write space unavailable" << std::endl;
         Result = std::basic_streambuf<char>::overflow(ch);
     }
     
@@ -98,8 +93,6 @@ std::basic_streambuf<char>::int_type GenericIOStreamTest::GenericStreamBuf::over
 }
 std::basic_streambuf<char>::int_type GenericIOStreamTest::GenericStreamBuf::underflow()
 {
-    std::cout << "GenericStreamBuf[underflow]: Underflow" << std::endl;
-    
     std::basic_streambuf<char>::int_type Result;
     
     //std::basic_streambuf<char>::char_type* PutBegin = pbase();
@@ -116,12 +109,12 @@ std::basic_streambuf<char>::int_type GenericIOStreamTest::GenericStreamBuf::unde
         {
             setg(GetEnd, GetEnd, InternalMem + MemLength);
         }
-        else //if(PutCurrent != InternalMem)
+        else
         {
             setg(InternalMem, InternalMem, PutCurrent);
         }
     }
-    else if(GetEnd < PutEnd) //&& GetEnd != PutCurrent)
+    else if(GetEnd < PutEnd)
     {
         setg(GetEnd, GetEnd, PutCurrent);
     }
@@ -138,15 +131,12 @@ std::basic_streambuf<char>::int_type GenericIOStreamTest::GenericStreamBuf::unde
     }
     
     PCAdvance = PutEnd != egptr();
-    //PrintStatus();
     if(egptr() - gptr() > 0)
     {
-        std::cout << "GenericStreamBuf[underflow]: Read space available" << std::endl;
         Result = sgetc();
     }
     else
     {
-        std::cout << "GenericStreamBuf[underflow]: Read space unavailable" << std::endl;
         Result = std::basic_streambuf<char>::underflow();
     }
     return Result;

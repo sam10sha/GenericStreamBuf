@@ -8,7 +8,7 @@ GenericIOStreamTest::GenericIStreamBuf::GenericIStreamBuf(const size_t BufferSiz
     DataRetrieveCB(nullptr)
 {
     std::memset(InternalMem, 0, BufferSize);
-    setp(InternalMem, InternalMem, InternalMem + BufferSize);
+    setp(InternalMem, InternalMem + BufferSize);
     setg(InternalMem, InternalMem, InternalMem);
 }
 GenericIOStreamTest::GenericIStreamBuf::~GenericIStreamBuf()
