@@ -1,11 +1,12 @@
 #ifndef GENERICISTREAMBUF_H
 #define GENERICISTREAMBUF_H
 
+#include "GenericStreamBuf.h"
 #include <streambuf>
 
 namespace GenericIOStreamTest
 {
-    class GenericIStreamBuf : public std::basic_streambuf<char>
+    class GenericIStreamBuf : public GenericStreamBuf
     {
     // Public structures
     public:
@@ -13,9 +14,14 @@ namespace GenericIOStreamTest
         {
         // Public member functions
         public:
-            virtual void Invoke(char* const Buffer, const size_t MaxLen)
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="Buffer"></param>
+            /// <param name="MaxLen"></param>
+            virtual size_t Invoke(void* const Buffer, const size_t MaxLen)
             {
-                
+                return 0;
             }
         };
         
@@ -24,7 +30,12 @@ namespace GenericIOStreamTest
         {
         // Public construction
         public:
-            DataRetrieveCallback_member(T* Ref, size_t (T::* Func)(char* const, const size_t)) :
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="Ref"></param>
+            /// <param name="Func"></param>
+            DataRetrieveCallback_member(T* Ref, size_t (T::* Func)(void* const, const size_t)) :
                 MemRef(Ref),
                 MemFunc(Func)
             {
@@ -33,22 +44,31 @@ namespace GenericIOStreamTest
             
         // Public member functions
         public:
-            virtual void Invoke(char* const Buffer, const size_t MaxLen)
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="Buffer"></param>
+            /// <param name="MaxLen"></param>
+            virtual size_t Invoke(void* const Buffer, const size_t MaxLen)
             {
-                (MemRef->*MemFunc)(Buffer, MaxLen);
+                return (MemRef->*MemFunc)(Buffer, MaxLen);
             }
             
         // Private member variables
         private:
             T* MemRef;
-            size_t (T::* MemFunc)(char* const Buffer, const size_t MaxLen);
+            size_t (T::* MemFunc)(void* const Buffer, const size_t MaxLen);
         };
         
         struct DataRetrieveCallback_plain : public DataRetrieveCallback_base
         {
         // Public construction
         public:
-            DataRetrieveCallback_plain(size_t (*FuncRef)(char* const, const size_t)) :
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="FuncRef"></param>
+            DataRetrieveCallback_plain(size_t (*FuncRef)(void* const, const size_t)) :
                 Func(FuncRef)
             {
                 
@@ -56,20 +76,24 @@ namespace GenericIOStreamTest
             
         // Public member functions
         public:
-            virtual void Invoke(char* const Buffer, const size_t MaxLen)
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="Buffer"></param>
+            /// <param name="MaxLen"></param>
+            virtual size_t Invoke(void* const Buffer, const size_t MaxLen)
             {
-                (*Func)(Buffer, MaxLen);
+                return (*Func)(Buffer, MaxLen);
             }
             
         // Private member variables
         private:
-            size_t (*Func)(char* const, const size_t);
+            size_t (*Func)(void* const, const size_t);
         };
         
     // Public construction/destruction
     public:
         GenericIStreamBuf(const size_t BufferSize);
-        ~GenericIStreamBuf();
         
     // Public member functions
     public:
@@ -79,10 +103,12 @@ namespace GenericIOStreamTest
     protected:
         virtual std::basic_streambuf<char>::int_type underflow();
         
+    // Private member functions
+    private:
+        void RetrieveData();
+        
     // Private member variables
     private:
-        const size_t MemLength;
-        char* InternalMem;
         DataRetrieveCallback_base* DataRetrieveCB;
     };
 }
