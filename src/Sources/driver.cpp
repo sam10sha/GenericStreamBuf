@@ -65,6 +65,10 @@ void TestGenericStreamBuf()
 
 void TestGenericIStreamBuf()
 {
+    Words.push_back("a");
+    Words.push_back("f");
+    Words.push_back("t");
+    Words.push_back("q");
     Words.push_back("hi");
     Words.push_back("of");
     Words.push_back("no");
@@ -88,14 +92,26 @@ void TestGenericIStreamBuf()
     GenericIStreamBuf::DataRetrieveCallback_plain DataRetrieveCB(&RetrieveData);
     GenericIStreamBuf IStreamBuf(0x10);
     GenericIStream IStream(&IStreamBuf);
+    char Bytes[0x40];
+    std::memset(Bytes, 0, 0x40);
     
     IStreamBuf.RegisterOnDataRetrieveCallback(&DataRetrieveCB);
     
-    
+    IStream.read(Bytes, 6);
+    //IStreamBuf.PrintStreamBuf();
+    cout << Bytes << endl;
 }
 size_t RetrieveData(void* const Buffer, const size_t MaxLen)
 {
-    int WordIndex = (MaxLen - 2) * 4 + (rand() % 4);
+    int WordIndex;
+    if(MaxLen >= 6)
+    {
+        WordIndex = 20 + (rand() % 4);
+    }
+    else
+    {
+        WordIndex = (MaxLen - 1) * 4 + (rand() % 4);
+    }
     string& Word = Words.at(WordIndex);
     size_t WordLen = Word.size();
     std::strcpy((char*)Buffer, Word.c_str());

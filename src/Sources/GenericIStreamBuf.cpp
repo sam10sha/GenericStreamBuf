@@ -20,7 +20,9 @@ std::basic_streambuf<char>::int_type GenericIOStreamTest::GenericIStreamBuf::und
 {
     std::basic_streambuf<char>::int_type Result;
     Result = GenericStreamBuf::underflow();
-    if(!Result)
+    
+    //if(!Result)
+    if(std::char_traits<char>::eq_int_type(Result, std::char_traits<char>::eof()))
     {
         RetrieveData();
         Result = GenericStreamBuf::underflow();
@@ -31,7 +33,7 @@ std::basic_streambuf<char>::int_type GenericIOStreamTest::GenericIStreamBuf::und
 // Private member functions
 void GenericIOStreamTest::GenericIStreamBuf::RetrieveData()
 {
-    bool DataRetrieved = false;
+    size_t NumBytes = 0;
     //std::basic_streambuf<char>::char_type* PutBegin = pbase();
     std::basic_streambuf<char>::char_type* PutEnd = epptr();
     std::basic_streambuf<char>::char_type* PutCurrent = pptr();
@@ -39,15 +41,18 @@ void GenericIOStreamTest::GenericIStreamBuf::RetrieveData()
     if(PutCurrent == PutEnd)
     {
         overflow('\0');
+        seekoff(-1, std::ios_base::cur, std::ios_base::out);
+        
         PutEnd = epptr();
         PutCurrent = pptr();
     }
     if(PutCurrent < PutEnd && DataRetrieveCB)
     {
-        DataRetrieved = DataRetrieveCB->Invoke(PutCurrent, PutEnd - PutCurrent);
+        NumBytes = DataRetrieveCB->Invoke(PutCurrent, PutEnd - PutCurrent);
+        seekoff((long)NumBytes, std::ios_base::cur, std::ios_base::out);
     }
     
-    if(DataRetrieved)
+    if(NumBytes)
     {
         RetrieveData();
     }

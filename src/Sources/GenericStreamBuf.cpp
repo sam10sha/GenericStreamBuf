@@ -199,25 +199,20 @@ std::basic_streambuf<char>::pos_type GenericIOStreamTest::GenericStreamBuf::seek
 {
     std::basic_streambuf<char>::pos_type ResultPos;
     std::basic_streambuf<char>::char_type* LimitPtr;
-    long MaxPtrDiff;
     switch(dir)
     {
         case std::ios_base::beg:
             LimitPtr = gptr();
-            MaxPtrDiff = LimitPtr - eback();
-            setg(eback() + ((MaxPtrDiff >= off) ? off : MaxPtrDiff), LimitPtr, epptr());
+            setg(eback() + DetermineMovement(eback(), off, LimitPtr, InternalMem), LimitPtr, epptr());
             ResultPos = std::basic_streambuf<char>::pos_type(eback() - InternalMem);
             break;
         case std::ios_base::cur:
-            LimitPtr = egptr();
-            MaxPtrDiff = LimitPtr - gptr();
-            gbump((MaxPtrDiff >= off) ? off : MaxPtrDiff);
+            gbump(DetermineMovement(gptr(), off, egptr(), eback()));
             ResultPos = std::basic_streambuf<char>::pos_type(gptr() - InternalMem);
             break;
         case std::ios_base::end:
             LimitPtr = InternalMem + MemLength;
-            MaxPtrDiff = LimitPtr - egptr();
-            setg(pbase(), LimitPtr, egptr() + ((MaxPtrDiff >= off) ? off : MaxPtrDiff));
+            setg(pbase(), LimitPtr, egptr() + DetermineMovement(egptr(), off, LimitPtr, gptr()));
             ResultPos = std::basic_streambuf<char>::pos_type(egptr() - InternalMem);
             break;
         default:
@@ -231,25 +226,21 @@ std::basic_streambuf<char>::pos_type GenericIOStreamTest::GenericStreamBuf::seek
 {
     std::basic_streambuf<char>::pos_type ResultPos;
     std::basic_streambuf<char>::char_type* LimitPtr;
-    long MaxPtrDiff;
     switch(dir)
     {
         case std::ios_base::beg:
             LimitPtr = pptr();
-            MaxPtrDiff = LimitPtr - pbase();
-            setp(pbase() + ((MaxPtrDiff >= off) ? off : MaxPtrDiff), epptr());
+            setp(pbase() + DetermineMovement(pbase(), off, LimitPtr, InternalMem), epptr());
             pbump(LimitPtr - pbase());
             ResultPos = std::basic_streambuf<char>::pos_type(pbase() - InternalMem);
             break;
         case std::ios_base::cur:
-            MaxPtrDiff = epptr() - pptr();
-            pbump((MaxPtrDiff >= off) ? off : MaxPtrDiff);
+            pbump(DetermineMovement(pptr(), off, epptr(), pbase()));
             ResultPos = std::basic_streambuf<char>::pos_type(pptr() - InternalMem);
             break;
         case std::ios_base::end:
             LimitPtr = pptr();
-            MaxPtrDiff = InternalMem + MemLength - epptr();
-            setp(pbase(), epptr() + ((MaxPtrDiff >= off) ? off : MaxPtrDiff));
+            setp(pbase(), epptr() + DetermineMovement(epptr(), off, InternalMem + MemLength, LimitPtr));
             pbump(LimitPtr - pbase());
             ResultPos = std::basic_streambuf<char>::pos_type(epptr() - InternalMem);
             break;
@@ -258,5 +249,21 @@ std::basic_streambuf<char>::pos_type GenericIOStreamTest::GenericStreamBuf::seek
             break;
     }
     return ResultPos;
+}
+std::basic_streambuf<char>::off_type GenericIOStreamTest::GenericStreamBuf::DetermineMovement(void* const Current, const std::basic_streambuf<char>::off_type Offset,
+                            void* const Max, void* const Min) const
+{
+    void* NewPos;
+    std::basic_streambuf<char>::off_type DeterminedOffset;
+    NewPos = (char*)Current + Offset;
+    if(NewPos >= Min && NewPos < Max)
+    {
+        DeterminedOffset = Offset;
+    }
+    else
+    {
+        DeterminedOffset = (Offset >= 0) ? (char*)Max - (char*)Current : (char*)Current - (char*)Min;
+    }
+    return DeterminedOffset;
 }
 

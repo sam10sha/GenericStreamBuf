@@ -28,9 +28,12 @@ namespace GenericIOStreamTest
         virtual std::streamsize showmanyc();
         
     // Private member functions    
-    private:    
+    private:
         std::basic_streambuf<char>::pos_type seekoff_in(const std::basic_streambuf<char>::off_type off, const std::ios_base::seekdir dir);
         std::basic_streambuf<char>::pos_type seekoff_out(const std::basic_streambuf<char>::off_type off, const std::ios_base::seekdir dir);
+        std::basic_streambuf<char>::off_type DetermineMovement(void* const Current, const std::basic_streambuf<char>::off_type Offset,
+                            void* const Max, void* const Min) const;
+        
         
     // Private member variables
     private:
