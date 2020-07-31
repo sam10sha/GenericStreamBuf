@@ -97,9 +97,11 @@ void TestGenericIStreamBuf()
     
     IStreamBuf.RegisterOnDataRetrieveCallback(&DataRetrieveCB);
     
-    IStream.read(Bytes, 6);
-    //IStreamBuf.PrintStreamBuf();
-    cout << Bytes << endl;
+    for(int i = 0; i < 20; i++)
+    {
+        IStream.read(Bytes, 6);
+        cout << Bytes << endl;
+    }
 }
 size_t RetrieveData(void* const Buffer, const size_t MaxLen)
 {
