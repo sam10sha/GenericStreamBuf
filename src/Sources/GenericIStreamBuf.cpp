@@ -37,12 +37,16 @@ void GenericIOStreamTest::GenericIStreamBuf::RetrieveData()
     //std::basic_streambuf<char>::char_type* PutBegin = pbase();
     std::basic_streambuf<char>::char_type* PutEnd = epptr();
     std::basic_streambuf<char>::char_type* PutCurrent = pptr();
-    
+    std::basic_streambuf<char>::int_type OverflowResult;
+    std::basic_streambuf<char>::int_type Eof = std::basic_streambuf<char>::traits_type::eof();
+
     if(PutCurrent == PutEnd)
     {
-        overflow('\0');
-        seekoff(-1, std::ios_base::cur, std::ios_base::out);
-        
+    	OverflowResult = overflow('\0');
+        if(!std::basic_streambuf<char>::traits_type::eq_int_type(OverflowResult, Eof))
+        {
+            seekoff(-1, std::ios_base::cur, std::ios_base::out);
+        }
         PutEnd = epptr();
         PutCurrent = pptr();
     }

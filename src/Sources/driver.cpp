@@ -51,11 +51,11 @@ void TestGenericStreamBuf()
     cout << Bytes << endl;
     
     OStream << "Meera";
-    StreamBuf.PrintStatus();
-    StreamBuf.PrintStreamBuf();
+    //StreamBuf.PrintStatus();
+    //StreamBuf.PrintStreamBuf();
     std::memset(Bytes, 0, 0x40);
     IStream.read(Bytes, 5);
-    StreamBuf.PrintStatus();
+    //StreamBuf.PrintStatus();
     cout << Bytes << endl;
     
     

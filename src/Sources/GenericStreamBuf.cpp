@@ -2,7 +2,17 @@
 #include "stdafx.h"
 
 // Public construction/destruction
+GenericIOStreamTest::GenericStreamBuf::GenericStreamBuf(void* const Mem, const size_t BufferSize) :
+	IsPredefinedMemory(true),
+	MemLength(BufferSize),
+	InternalMem((char*)Mem),
+	PCAdvance(false)
+{
+    setp(InternalMem, InternalMem);
+    setg(InternalMem, InternalMem, InternalMem);
+}
 GenericIOStreamTest::GenericStreamBuf::GenericStreamBuf(const size_t BufferSize) :
+	IsPredefinedMemory(false),
     MemLength(BufferSize),
     InternalMem(new char[BufferSize]),
     PCAdvance(false)
@@ -14,28 +24,11 @@ GenericIOStreamTest::GenericStreamBuf::GenericStreamBuf(const size_t BufferSize)
 
 GenericIOStreamTest::GenericStreamBuf::~GenericStreamBuf()
 {
-    if(InternalMem)
+    if(!IsPredefinedMemory && InternalMem)
     {
         delete[] InternalMem;
         InternalMem = nullptr;
     }
-}
-	
-
-// Public member functions
-void GenericIOStreamTest::GenericStreamBuf::PrintStreamBuf() const
-{
-    std::cout << "GenericStreamBuf[PrintStreamBuf]: " << InternalMem << std::endl;
-}
-void GenericIOStreamTest::GenericStreamBuf::PrintStatus() const
-{
-    std::cout << "GenericStreamBuf[PrintStatus]: PutBegin = " << pbase() - InternalMem << std::endl;
-    std::cout << "GenericStreamBuf[PrintStatus]: PutEnd = " << epptr() - InternalMem << std::endl;
-    std::cout << "GenericStreamBuf[PrintStatus]: PutCurrent = " << pptr() - InternalMem << std::endl;
-    std::cout << "GenericStreamBuf[PrintStatus]: GetBegin = " << eback() - InternalMem << std::endl;
-    std::cout << "GenericStreamBuf[PrintStatus]: GetEnd = " << egptr() - InternalMem << std::endl;
-    std::cout << "GenericStreamBuf[PrintStatus]: GetCurrent = " << gptr() - InternalMem << std::endl;
-    std::cout << "GenericStreamBuf[PrintStatus]: PCAdvance = " << PCAdvance << std::endl;
 }
 
 
@@ -210,11 +203,11 @@ std::basic_streambuf<char>::pos_type GenericIOStreamTest::GenericStreamBuf::seek
             gbump(DetermineMovement(gptr(), off, egptr(), eback()));
             ResultPos = std::basic_streambuf<char>::pos_type(gptr() - InternalMem);
             break;
-        case std::ios_base::end:
+        /* case std::ios_base::end:
             LimitPtr = InternalMem + MemLength;
             setg(pbase(), LimitPtr, egptr() + DetermineMovement(egptr(), off, LimitPtr, gptr()));
             ResultPos = std::basic_streambuf<char>::pos_type(egptr() - InternalMem);
-            break;
+            break; */
         default:
             ResultPos = std::basic_streambuf<char>::pos_type(0);
             break;
@@ -238,12 +231,12 @@ std::basic_streambuf<char>::pos_type GenericIOStreamTest::GenericStreamBuf::seek
             pbump(DetermineMovement(pptr(), off, epptr(), pbase()));
             ResultPos = std::basic_streambuf<char>::pos_type(pptr() - InternalMem);
             break;
-        case std::ios_base::end:
+        /* case std::ios_base::end:
             LimitPtr = pptr();
             setp(pbase(), epptr() + DetermineMovement(epptr(), off, InternalMem + MemLength, LimitPtr));
             pbump(LimitPtr - pbase());
             ResultPos = std::basic_streambuf<char>::pos_type(epptr() - InternalMem);
-            break;
+            break; */
         default:
             ResultPos = std::basic_streambuf<char>::pos_type(0);
             break;
